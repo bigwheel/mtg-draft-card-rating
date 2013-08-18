@@ -6,7 +6,7 @@ import Database.threadLocalSession
 import play.api.data._
 import play.api.data.Forms._
 
-object Account extends Table[(String, String)]("ACCOUNT") {
+object Accounts extends Table[(String, String)]("ACCOUNTS") {
   def name = column[String]("NAME", O.PrimaryKey)
   def password = column[String]("PASSWORD")
   def * = name ~ password
@@ -21,7 +21,7 @@ object Application extends Controller {
 
   def index = Action {
     val names = accountConnection withSession {
-      ( for( c <- Account; if c.name.length < 5 ) yield c.name ).list
+      ( for( c <- Accounts; if c.name.length < 5 ) yield c.name ).list
       // or
       //Account.filter(_.name.length < 5).map(_.name).list
     }
@@ -47,12 +47,12 @@ object Application extends Controller {
     val (name, password) = loginForm.bindFromRequest.get
 
     accountConnection withSession {
-      val result = ( for(a <- Account; if a.name === name) yield a.name ).list
+      val result = ( for(a <- Accounts; if a.name === name) yield a.name ).list
 
       println(result.toString)
 
       if (result.length == 0) {
-        Account.insert(name, password)
+        Accounts.insert(name, password)
         Ok("name: " + name + "\npassword: " + password)
       } else {
         Forbidden("that name is already existed")
