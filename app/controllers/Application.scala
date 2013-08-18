@@ -42,10 +42,10 @@ object Application extends Controller {
       tuple("name" -> text, "password" -> text)
     )
 
-    // TODO: トランザクション処理がまったくない
-    // トランザクション内でSELECT & INSERTするよう修正するべき
     val (name, password) = loginForm.bindFromRequest.get
 
+    // TODO: トランザクション処理がまったくない
+    // トランザクション内でSELECT & INSERTするよう修正するべき
     accountConnection withSession {
       val result = ( for(a <- Accounts; if a.name === name) yield a.name ).list
 
