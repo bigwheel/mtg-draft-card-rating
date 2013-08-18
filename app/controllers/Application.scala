@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import scala.slick.driver.MySQLDriver.simple._
 import Database.threadLocalSession
@@ -14,7 +13,7 @@ object Coffees extends Table[(String, Double)]("COFFEES") {
 }
 
 object Application extends Controller {
-  
+
   def index = Action {
     Database.forURL("jdbc:mysql://localhost/test1?user=root&password=", driver = "com.mysql.jdbc.Driver") withSession {
       ( for( c <- Coffees; if c.price < 10.0 ) yield c.name ).list
@@ -38,6 +37,7 @@ object Application extends Controller {
     )
 
     val (name, password) = loginForm.bindFromRequest.get
+
 
     Ok("name: " + name + "\npassword: " + password)
   }
