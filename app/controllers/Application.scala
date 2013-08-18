@@ -26,5 +26,8 @@ object Application extends Controller {
   def sign_up = Action {
     Ok(views.html.sign_up())
   }
-  
+
+  def account = Action {
+    Ok("post ok")
+  }
 }
