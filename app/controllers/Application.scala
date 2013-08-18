@@ -4,6 +4,8 @@ import play.api._
 import play.api.mvc._
 import scala.slick.driver.MySQLDriver.simple._
 import Database.threadLocalSession
+import play.api.data._
+import play.api.data.Forms._
 
 object Coffees extends Table[(String, Double)]("COFFEES") {
   def name = column[String]("COF_NAME", O.PrimaryKey)
@@ -27,7 +29,16 @@ object Application extends Controller {
     Ok(views.html.sign_up())
   }
 
-  def account = Action {
-    Ok("post ok")
+  def account = Action { implicit request =>
+    val loginForm = Form(
+      tuple(
+        "name" -> text,
+        "password" -> text
+      )
+    )
+
+    val (name, password) = loginForm.bindFromRequest.get
+
+    Ok("name: " + name + "\npassword: " + password)
   }
 }
