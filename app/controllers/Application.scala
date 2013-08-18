@@ -6,22 +6,27 @@ import Database.threadLocalSession
 import play.api.data._
 import play.api.data.Forms._
 
-object Coffees extends Table[(String, Double)]("COFFEES") {
-  def name = column[String]("COF_NAME", O.PrimaryKey)
-  def price = column[Double]("PRICE")
-  def * = name ~ price
+object Account extends Table[(String, String)]("ACCOUNT") {
+  def name = column[String]("NAME", O.PrimaryKey)
+  def password = column[String]("PASSWORD")
+  def * = name ~ password
 }
 
 object Application extends Controller {
 
+  def accountConnection = Database.forURL(
+    "jdbc:mysql://localhost/test1?user=root&password=",
+    driver = "com.mysql.jdbc.Driver"
+  )
+
   def index = Action {
-    Database.forURL("jdbc:mysql://localhost/test1?user=root&password=", driver = "com.mysql.jdbc.Driver") withSession {
-      ( for( c <- Coffees; if c.price < 10.0 ) yield c.name ).list
+    val names = accountConnection withSession {
+      ( for( c <- Account; if c.name.length < 5 ) yield c.name ).list
       // or
-      Coffees.filter(_.price < 10.0).map(_.name).list
+      //Account.filter(_.name.length < 5).map(_.name).list
     }
 
-    Ok("test")
+    Ok("ok" + names.toString())
   }
 
   def sign_up = Action {
@@ -37,8 +42,21 @@ object Application extends Controller {
       tuple("name" -> text, "password" -> text)
     )
 
+    // TODO: トランザクション処理がまったくない
+    // トランザクション内でSELECT & INSERTするよう修正するべき
     val (name, password) = loginForm.bindFromRequest.get
 
-    Ok("name: " + name + "\npassword: " + password)
+    accountConnection withSession {
+      val result = ( for(a <- Account; if a.name === name) yield a.name ).list
+
+      println(result.toString)
+
+      if (result.length == 0) {
+        Account.insert(name, password)
+        Ok("name: " + name + "\npassword: " + password)
+      } else {
+        Forbidden("that name is already existed")
+      }
+    }
   }
 }
