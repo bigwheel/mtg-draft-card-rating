@@ -28,16 +28,16 @@ object Application extends Controller {
     Ok(views.html.sign_up())
   }
 
+  /**
+   * TODO: PUT化するべき
+   * 実質PUTとして扱う
+   */
   def account = Action { implicit request =>
     val loginForm = Form(
-      tuple(
-        "name" -> text,
-        "password" -> text
-      )
+      tuple("name" -> text, "password" -> text)
     )
 
     val (name, password) = loginForm.bindFromRequest.get
-
 
     Ok("name: " + name + "\npassword: " + password)
   }

@@ -5,6 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /sign_up                    controllers.Application.sign_up
+
+# TODO: PUT化するべき
 POST    /account                    controllers.Application.account
 
 # Map static resources from the /public folder to the /assets URL path
