@@ -1,0 +1,12 @@
+# test1 スキーマ
+
+# --- !Ups
+
+CREATE TABLE COFFEES(
+  COF_NAME VARCHAR(64),
+  PRICE    DOUBLE
+);
+
+# --- !Downs
+
+DROP TABLE COFFEES
