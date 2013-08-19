@@ -20,13 +20,7 @@ object Application extends Controller {
   )
 
   def index = Action {
-    val names = accountConnection withSession {
-      ( for( c <- Accounts; if c.name.length < 5 ) yield c.name ).list
-      // or
-      //Account.filter(_.name.length < 5).map(_.name).list
-    }
-
-    Ok("ok" + names.toString())
+    Ok(views.html.index())
   }
 
   def sign_up = Action {
