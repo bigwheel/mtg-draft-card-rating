@@ -61,8 +61,6 @@ object Application extends Controller {
     accountConnection withSession {
       val result = ( for(a <- Accounts; if a.name === name) yield a.name ).list
 
-      println(result.toString)
-
       if (result.length == 0) {
         Accounts.insert(name, password)
         Ok("name: " + name + "\npassword: " + password)
