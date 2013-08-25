@@ -11,9 +11,12 @@
                     パスワード
                     <input type="password" name="password" value="def" />
                 </label>
-                <input type="submit" />
+                <input type="submit" value="ログイン" />
             }
         } else {
             あなたは@name.getとしてloginしています
+            @helper.form(action = routes.Application.logout) {
+                <input type="submit" value="ログアウト" />
+            }
         }
 }

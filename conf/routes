@@ -11,5 +11,8 @@ POST    /account                    controllers.Application.account
 
 GET     /login                      controllers.Application.login
 
+# TODO: ログイン情報はcookieにしか保存されてないので、本来はクライアントサイドでJSを使ってcookieを削除するべき？
+GET     /logout                     controllers.Application.logout
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
