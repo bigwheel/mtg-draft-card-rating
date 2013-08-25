@@ -31,10 +31,6 @@ object Application extends Controller {
     tuple("name" -> text, "password" -> text)
   )
 
-  /**
-   * TODO: PUT化するべき
-   * 実質PUTとして扱う
-   */
   def login = Action { implicit request =>
     val (name, password) = accountForm.bindFromRequest.get
 
