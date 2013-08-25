@@ -40,11 +40,11 @@ object Application extends Controller {
       val result = ( for(a <- Accounts; if a.name === name && a.password === password) yield a.name ).list
 
       if (result.length == 0) {
+        Forbidden("アカウント名またはパスワードが違います")
+      } else {
         Ok("name: " + name + "\npassword: " + password).withSession(
           session + ("name" -> name)
         )
-      } else {
-        Forbidden("アカウント名またはパスワードが違います")
       }
     }
   }
