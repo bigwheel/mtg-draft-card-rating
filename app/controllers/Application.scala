@@ -19,12 +19,38 @@ object Application extends Controller {
     driver = "com.mysql.jdbc.Driver"
   )
 
-  def index = Action {
-    Ok(views.html.index())
+  def index = Action { request =>
+    Ok(views.html.index(request.session.get("name")))
   }
 
   def sign_up = Action {
     Ok(views.html.sign_up())
+  }
+
+  private[this] val accountForm = Form(
+    tuple("name" -> text, "password" -> text)
+  )
+
+  /**
+   * TODO: PUT化するべき
+   * 実質PUTとして扱う
+   */
+  def login = Action { implicit request =>
+    val (name, password) = accountForm.bindFromRequest.get
+
+    // TODO: トランザクション処理がまったくない
+    // トランザクション内でSELECT & INSERTするよう修正するべき
+    accountConnection withSession {
+      val result = ( for(a <- Accounts; if a.name === name && a.password === password) yield a.name ).list
+
+      if (result.length == 0) {
+        Ok("name: " + name + "\npassword: " + password).withSession(
+          session + ("name" -> name)
+        )
+      } else {
+        Forbidden("that name is already existed")
+      }
+    }
   }
 
   /**
@@ -32,11 +58,7 @@ object Application extends Controller {
    * 実質PUTとして扱う
    */
   def account = Action { implicit request =>
-    val loginForm = Form(
-      tuple("name" -> text, "password" -> text)
-    )
-
-    val (name, password) = loginForm.bindFromRequest.get
+    val (name, password) = accountForm.bindFromRequest.get
 
     // TODO: トランザクション処理がまったくない
     // トランザクション内でSELECT & INSERTするよう修正するべき

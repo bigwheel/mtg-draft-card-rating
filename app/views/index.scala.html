@@ -1,13 +1,19 @@
+@(name: Option[String])
+
 @_template("Login") {
-        <form action="/login" method="post">
-            <label>
-                アカウント名
-                <input type="text" name="name" value="abc" />
-            </label>
-            <label>
-                パスワード
-                <input type="password" name="password" value="def" />
-            </label>
-            <input type="submit" />
-        </form>
+        @if(name.isEmpty) {
+            <form action="/login" method="post">
+                <label>
+                    アカウント名
+                    <input type="text" name="name" value="abc" />
+                </label>
+                <label>
+                    パスワード
+                    <input type="password" name="password" value="def" />
+                </label>
+                <input type="submit" />
+            </form>
+        } else {
+            あなたは@name.getとしてloginしています
+        }
 }
