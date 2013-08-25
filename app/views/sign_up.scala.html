@@ -1,13 +1,15 @@
+@(accountForm: Form[(String, String)])
+
 @_template("Sign up") {
-        <form action="/account" method="post">
-            <label>
-                アカウント名
-                <input type="text" name="name" value="abc" />
-            </label>
-            <label>
-                パスワード
-                <input type="password" name="password" value="def" />
-            </label>
-            <input type="submit" />
-        </form>
+    @helper.form(action = routes.Application.account) {
+        <label>
+            アカウント名
+            <input type="text" name="name" value="abc" />
+        </label>
+        <label>
+            パスワード
+            <input type="password" name="password" value="def" />
+        </label>
+        <input type="submit" />
+    }
 }

@@ -1,4 +1,4 @@
-@(name: Option[String])
+@(name: Option[String], accountForm: Form[(String, String)])
 
 @_template("Login") {
         @if(name.isEmpty) {

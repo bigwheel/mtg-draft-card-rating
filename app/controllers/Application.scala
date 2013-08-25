@@ -19,17 +19,17 @@ object Application extends Controller {
     driver = "com.mysql.jdbc.Driver"
   )
 
-  def index = Action { request =>
-    Ok(views.html.index(request.session.get("name")))
-  }
-
-  def sign_up = Action {
-    Ok(views.html.sign_up())
-  }
-
   private[this] val accountForm = Form(
     tuple("name" -> text, "password" -> text)
   )
+
+  def index = Action { request =>
+    Ok(views.html.index(request.session.get("name"), accountForm))
+  }
+
+  def sign_up = Action {
+    Ok(views.html.sign_up(accountForm))
+  }
 
   def login = Action { implicit request =>
     val (name, password) = accountForm.bindFromRequest.get
