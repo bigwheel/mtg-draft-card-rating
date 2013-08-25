@@ -3,14 +3,8 @@
 @_template("Login") {
         @if(name.isEmpty) {
             @helper.form(action = routes.Application.login) {
-                <label>
-                    アカウント名
-                    <input type="text" name="name" value="abc" />
-                </label>
-                <label>
-                    パスワード
-                    <input type="password" name="password" value="def" />
-                </label>
+                @helper.inputText(accountForm("name"), '_label -> "アカウント名")
+                @helper.inputPassword(accountForm("password"), '_label -> "パスワード")
                 <input type="submit" value="ログイン" />
             }
         } else {

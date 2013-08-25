@@ -24,11 +24,11 @@ object Application extends Controller {
   )
 
   def index = Action { request =>
-    Ok(views.html.index(request.session.get("name"), accountForm))
+    Ok(views.html.index(request.session.get("name"), accountForm.fill(("abc", ""))))
   }
 
   def sign_up = Action {
-    Ok(views.html.sign_up(accountForm))
+    Ok(views.html.sign_up(accountForm.fill(("abc", ""))))
   }
 
   def login = Action { implicit request =>

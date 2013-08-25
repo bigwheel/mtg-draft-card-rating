@@ -2,14 +2,8 @@
 
 @_template("Sign up") {
     @helper.form(action = routes.Application.account) {
-        <label>
-            アカウント名
-            <input type="text" name="name" value="abc" />
-        </label>
-        <label>
-            パスワード
-            <input type="password" name="password" value="def" />
-        </label>
-        <input type="submit" />
+        @helper.inputText(accountForm("name"), '_label -> "アカウント名")
+        @helper.inputPassword(accountForm("password"), '_label -> "パスワード")
+        <input type="submit" value="アカウント作成" />
     }
 }
