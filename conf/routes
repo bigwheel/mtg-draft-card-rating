@@ -9,7 +9,8 @@ GET     /sign_up                    controllers.Application.sign_up
 # TODO: PUT化するべき
 POST    /account                    controllers.Application.account
 
-GET     /login                      controllers.Application.login
+# TODO: GETだとパスワードがＵＲＩ内に含まれるので仕方がなくPOSTを使用
+POST    /login                      controllers.Application.login
 
 # TODO: ログイン情報はcookieにしか保存されてないので、本来はクライアントサイドでJSを使ってcookieを削除するべき？
 GET     /logout                     controllers.Application.logout
