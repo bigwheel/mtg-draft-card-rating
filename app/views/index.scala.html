@@ -2,7 +2,7 @@
 
 @_template("Login") {
         @if(name.isEmpty) {
-            <form action="/login" method="post">
+            @helper.form(action = routes.Application.login) {
                 <label>
                     アカウント名
                     <input type="text" name="name" value="abc" />
@@ -12,7 +12,7 @@
                     <input type="password" name="password" value="def" />
                 </label>
                 <input type="submit" />
-            </form>
+            }
         } else {
             あなたは@name.getとしてloginしています
         }
