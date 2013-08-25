@@ -70,21 +70,7 @@ object Application extends Controller {
     }
   }
 
-  def login = Action { implicit request =>
-    val (name, password) = accountForm.bindFromRequest.get
-
-    // TODO: トランザクション処理がまったくない
-    // トランザクション内でSELECT & INSERTするよう修正するべき
-    accountConnection withSession {
-      val result = ( for(a <- Accounts; if a.name === name && a.password === password) yield a.name ).list
-
-      if (result.length == 0) {
-        Ok("name: " + name + "\npassword: " + password).withSession(
-          session + ("name" -> name)
-        )
-      } else {
-        Forbidden("that name is already existed")
-      }
-    }
+  def logout = Action { implicit request =>
+    Ok("ログアウトしました").withNewSession
   }
 }
