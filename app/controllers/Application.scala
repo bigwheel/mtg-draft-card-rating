@@ -5,6 +5,8 @@ import scala.slick.driver.MySQLDriver.simple._
 import Database.threadLocalSession
 import play.api.data._
 import play.api.data.Forms._
+import play.api.db._
+import play.api.Play._
 
 object Accounts extends Table[(String, String)]("ACCOUNTS") {
   def name = column[String]("NAME", O.PrimaryKey)
@@ -14,10 +16,7 @@ object Accounts extends Table[(String, String)]("ACCOUNTS") {
 
 object Application extends Controller {
 
-  def accountConnection = Database.forURL(
-    "jdbc:mysql://localhost/test1?user=root&password=",
-    driver = "com.mysql.jdbc.Driver"
-  )
+  def accountConnection = Database.forDataSource(DB.getDataSource("default"))
 
   private[this] val accountForm = Form(
     tuple("name" -> text, "password" -> text)
