@@ -47,9 +47,10 @@ class ApplicationSpec extends Specification with BeforeExample {
       "can login after creating account" in {
         running(FakeApplication()) {
           route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          val home = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+          Thread.sleep(100) // なぜかないと403になる
+          val result = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(home) must equalTo(OK)
+          status(result) must equalTo(OK)
         }
       }
     }
@@ -64,6 +65,7 @@ class ApplicationSpec extends Specification with BeforeExample {
       "can logout after login" in {
         running(FakeApplication()) {
           route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+          Thread.sleep(100) // なぜかないと403になる
           route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
           status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
@@ -71,11 +73,22 @@ class ApplicationSpec extends Specification with BeforeExample {
       }
     }
 
-    "can create an account" in {
-      running(FakeApplication()) {
-        val home = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+    "about create account" in {
+      "can create an account" in {
+        running(FakeApplication()) {
+          val home = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-        status(home) must equalTo(OK)
+          status(home) must equalTo(OK)
+        }
+      }
+
+      "cant create an account with existing account name" in {
+        running(FakeApplication()) {
+          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+          val result = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+
+          status(result) must equalTo(FORBIDDEN)
+        }
       }
     }
 
