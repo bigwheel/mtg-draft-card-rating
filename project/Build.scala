@@ -12,12 +12,14 @@ object ApplicationBuild extends Build {
     jdbc,
     anorm,
     "com.typesafe.play" %% "play-slick" % "0.4.0",
-    "mysql" % "mysql-connector-java" % "5.1.26"
+    "mysql" % "mysql-connector-java" % "5.1.26",
+    "securesocial" %% "securesocial" % "master-SNAPSHOT"
   )
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    // Add your own project settings here
+    resolvers += Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
   )
 
 }

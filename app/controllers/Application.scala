@@ -7,6 +7,8 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.db._
 import play.api.Play._
+import org.mindrot.jbcrypt.BCrypt
+import play.api.Logger
 
 object Accounts extends Table[(String, String)]("ACCOUNTS") {
   def name = column[String]("NAME", O.PrimaryKey)
@@ -31,17 +33,18 @@ object Application extends Controller {
   }
 
   def login = Action { implicit request =>
-    val (name, password) = accountForm.bindFromRequest.get
+    val (name, plainPassword) = accountForm.bindFromRequest.get
 
     // TODO: トランザクション処理がまったくない
     // トランザクション内でSELECT & INSERTするよう修正するべき
     accountConnection withSession {
-      val result = ( for(a <- Accounts; if a.name === name && a.password === password) yield a.name ).list
+      val result = ( for(a <- Accounts; if a.name === name) yield a.password ).list
 
-      if (result.length == 0) {
+      println("aaaaaaaaaaa" + result.length + "aaaaaaaaa")
+      if (result.length == 0 || !BCrypt.checkpw(plainPassword, result(0))) {
         Forbidden("アカウント名またはパスワードが違います")
       } else {
-        Ok("name: " + name + "\npassword: " + password).withSession(
+        Ok("name: " + name + "\npassword: " + plainPassword).withSession(
           session + ("name" -> name)
         )
       }
@@ -53,7 +56,12 @@ object Application extends Controller {
    * 実質PUTとして扱う
    */
   def account = Action { implicit request =>
-    val (name, password) = accountForm.bindFromRequest.get
+    val (name, plainPassword) = accountForm.bindFromRequest.get
+
+    // TODO: 本当はsaltを設定するべきなのでこの標準実装はよくない。
+    // 下記URLを参考にしつつ自分でsltを使用した実装をするべき
+    // http://www.atmarkit.co.jp/fsecurity/special/165pswd/01.html
+    val password = BCrypt.hashpw(plainPassword, BCrypt.gensalt())
 
     // TODO: トランザクション処理がまったくない
     // トランザクション内でSELECT & INSERTするよう修正するべき

@@ -46,8 +46,9 @@ class ApplicationSpec extends Specification with BeforeExample {
 
       "can login after creating account" in {
         running(FakeApplication()) {
-          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          Thread.sleep(100) // なぜかないと403になる
+          val r = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+          status(r) must equalTo(OK)
+          Thread.sleep(1000) // なぜかないと403になる
           val result = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
           status(result) must equalTo(OK)
@@ -65,7 +66,7 @@ class ApplicationSpec extends Specification with BeforeExample {
       "can logout after login" in {
         running(FakeApplication()) {
           route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          Thread.sleep(100) // なぜかないと403になる
+          Thread.sleep(1000) // なぜかないと403になる
           route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
           status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
@@ -84,7 +85,10 @@ class ApplicationSpec extends Specification with BeforeExample {
 
       "cant create an account with existing account name" in {
         running(FakeApplication()) {
-          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+
+          val r = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+          status(r) must equalTo(FORBIDDEN)
+          Thread.sleep(1000) // なぜかないと403になる
           val result = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
           status(result) must equalTo(FORBIDDEN)
