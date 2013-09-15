@@ -40,7 +40,6 @@ object Application extends Controller {
     accountConnection withSession {
       val result = ( for(a <- Accounts; if a.name === name) yield a.password ).list
 
-      println("aaaaaaaaaaa" + result.length + "aaaaaaaaa")
       if (result.length == 0 || !BCrypt.checkpw(plainPassword, result(0))) {
         Forbidden("アカウント名またはパスワードが違います")
       } else {
