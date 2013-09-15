@@ -19,84 +19,66 @@ class ApplicationSpec extends Specification with BeforeExample {
 
   sequential
 
-  def before = {
-    running(FakeApplication()) {
-      Application.accountConnection withSession {
-        Query(Accounts).delete
-      }
+  def before = new WithApplication {
+    Application.accountConnection withSession {
+      Query(Accounts).delete
     }
   }
 
   "Application" should {
 
-    "send 404 on a bad request" in {
-      running(FakeApplication()) {
-        route(FakeRequest(GET, "/boum")) must beNone
-      }
+    "send 404 on a bad request" in new WithApplication {
+      route(FakeRequest(GET, "/boum")) must beNone
     }
 
     "about login" should {
-      "cant login before to creating account" in {
-        running(FakeApplication()) {
-          val home = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+      "cant login before to creating account" in new WithApplication {
+        val home = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(home) must equalTo(FORBIDDEN)
-        }
+        status(home) must equalTo(FORBIDDEN)
       }
 
-      "can login after creating account" in {
-        running(FakeApplication()) {
-          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          val result = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+      "can login after creating account" in new WithApplication {
+        route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+        val result = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(result) must equalTo(OK)
-        }
+        status(result) must equalTo(OK)
       }
     }
 
     "about logout" should {
-      "can logout before login" in { // TODO: 本来はログイン前にログアウトできるべきではな気がする
-        running(FakeApplication()) {
-          status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
-        }
+      "can logout before login" in new WithApplication { // TODO: 本来はログイン前にログアウトできるべきではな気がする
+        status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
       }
 
-      "can logout after login" in {
-        running(FakeApplication()) {
-          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+      "can logout after login" in new WithApplication {
+        route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+        route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
-        }
+        status(route(FakeRequest(GET, "/logout")).get) must equalTo(OK)
       }
     }
 
     "about create account" in {
-      "can create an account" in {
-        running(FakeApplication()) {
-          val home = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+      "can create an account" in new WithApplication {
+        val home = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(home) must equalTo(OK)
-        }
+        status(home) must equalTo(OK)
       }
 
-      "cant create an account with existing account name" in {
-        running(FakeApplication()) {
-          route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-          val result = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+      "cant create an account with existing account name" in new WithApplication {
+        route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+        val result = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-          status(result) must equalTo(FORBIDDEN)
-        }
+        status(result) must equalTo(FORBIDDEN)
       }
     }
 
-    "render the index page" in {
-      running(FakeApplication()) {
-        val home = route(FakeRequest(GET, "/")).get
+    "render the index page" in new WithApplication {
+      val home = route(FakeRequest(GET, "/")).get
 
-        status(home) must equalTo(OK)
-        contentAsString(home) must contain ("アカウント名")
-      }
+      status(home) must equalTo(OK)
+      contentAsString(home) must contain ("アカウント名")
     }
   }
 }
