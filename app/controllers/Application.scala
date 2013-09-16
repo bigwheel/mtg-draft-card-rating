@@ -35,18 +35,16 @@ object Application extends Controller {
   def login = Action { implicit request =>
     val (name, plainPassword) = accountForm.bindFromRequest.get
 
-    // TODO: トランザクション処理がまったくない
-    // トランザクション内でSELECT & INSERTするよう修正するべき
-    accountConnection withSession {
-      val result = ( for(a <- Accounts; if a.name === name) yield a.password ).list
+    val result = accountConnection withSession {
+      ( for(a <- Accounts; if a.name === name) yield a.password ).list
+    }
 
-      if (result.length == 0 || !BCrypt.checkpw(plainPassword, result(0))) {
-        Forbidden("アカウント名またはパスワードが違います")
-      } else {
-        Ok("name: " + name + "\npassword: " + plainPassword).withSession(
-          session + ("name" -> name)
-        )
-      }
+    if (result.length == 0 || !BCrypt.checkpw(plainPassword, result(0))) {
+      Forbidden("アカウント名またはパスワードが違います")
+    } else {
+      Ok("name: " + name + "\npassword: " + plainPassword).withSession(
+        session + ("name" -> name)
+      )
     }
   }
 
