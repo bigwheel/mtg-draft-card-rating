@@ -39,10 +39,8 @@ class ApplicationSpec extends Specification with BeforeExample {
       }
 
       "can login after creating account" in new WithApplication {
-        route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-        val result = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-
-        status(result) must equalTo(OK)
+        status(route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get) must equalTo(OK)
+        status(route(FakeRequest(POST, "/login").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get) must equalTo(OK)
       }
     }
 
@@ -67,10 +65,15 @@ class ApplicationSpec extends Specification with BeforeExample {
       }
 
       "cant create an account with existing account name" in new WithApplication {
-        route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
-        val result = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+        val result1 = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
+        val result2 = route(FakeRequest(POST, "/account").withFormUrlEncodedBody("name" -> "abc", "password" -> "def")).get
 
-        status(result) must equalTo(FORBIDDEN)
+        if (status(result1) == OK)
+          status(result2) must equalTo(FORBIDDEN)
+        else {
+          status(result1) must equalTo(FORBIDDEN)
+          status(result2) must equalTo(OK)
+        }
       }
     }
 

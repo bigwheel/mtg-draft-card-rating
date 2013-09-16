@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import play.api.db._
 import play.api.Play._
 import org.mindrot.jbcrypt.BCrypt
-import play.api.Logger
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 
 object Accounts extends Table[(String, String)]("ACCOUNTS") {
   def name = column[String]("NAME", O.PrimaryKey)
@@ -62,15 +62,12 @@ object Application extends Controller {
 
     // TODO: トランザクション処理がまったくない
     // トランザクション内でSELECT & INSERTするよう修正するべき
-    accountConnection withSession {
-      val result = ( for(a <- Accounts; if a.name === name) yield a.name ).list
-
-      if (result.length == 0) {
-        Accounts.insert(name, password)
-        Ok("name: " + name + "\npassword: " + password)
-      } else {
+    try {
+      accountConnection withSession { Accounts.insert(name, password) }
+      Ok("name: " + name + "\npassword: " + password)
+    } catch {
+      case _: MySQLIntegrityConstraintViolationException =>
         Forbidden("そのアカウント名はすでに使用されています")
-      }
     }
   }
 
